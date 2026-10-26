@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>브릿지 커피 메뉴판</title>
+<style>
+  /* ===== 색상 ===== 여기 두 줄만 바꾸면 전체 색이 바뀝니다 */
+  :root {
+    --brown: #4A3728;   /* 짙은 갈색: 배경, 제목 */
+    --cream: #F5EFE6;   /* 크림색: 카드, 본문 */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    /* 글꼴: 고운 돋움 먼저, 없으면 맑은 고딕 */
+    font-family: "고운 돋움", "GowunDodum", "Gowun Dodum", "맑은 고딕", "Malgun Gothic", sans-serif;
+    background: var(--brown);
+    background-image:
+      radial-gradient(circle at 20% 0%, rgba(245,239,230,0.18), transparent 45%),
+      radial-gradient(circle at 90% 60%, rgba(245,239,230,0.10), transparent 40%);
+    background-attachment: fixed;
+    color: var(--cream);
+    min-height: 100vh;
+  }
+
+  .wrap { max-width: 430px; margin: 0 auto; padding: 28px 18px 40px; }
+
+  /* 글래스 카드 공통 모양 */
+  .glass {
+    background: rgba(245, 239, 230, 0.88);
+    color: var(--brown);
+    border-radius: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  header { text-align: center; margin-bottom: 22px; }
+  header h1 { font-size: 30px; letter-spacing: 1px; }
+  header .intro { margin-top: 8px; font-size: 15px; opacity: 0.9; }
+  header .place { margin-top: 4px; font-size: 13px; opacity: 0.7; }
+
+  h2.section { font-size: 16px; margin: 22px 0 10px 4px; }
+
+  /* 대표 메뉴 */
+  .signature { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .signature .glass { padding: 16px 14px; text-align: center; }
+  .badge {
+    display: inline-block; font-size: 11px; padding: 3px 10px; margin-bottom: 8px;
+    border-radius: 999px; background: var(--brown); color: var(--cream);
+  }
+  .signature .name { font-size: 17px; font-weight: bold; }
+  .signature .price { margin-top: 4px; font-size: 15px; }
+
+  /* 카테고리 버튼 */
+  .tabs { display: flex; gap: 8px; margin: 22px 0 14px; }
+  .tabs button {
+    flex: 1; padding: 11px 0; font-family: inherit; font-size: 14px; cursor: pointer;
+    border-radius: 999px; border: 1px solid rgba(245,239,230,0.5);
+    background: rgba(245,239,230,0.12); color: var(--cream);
+  }
+  .tabs button.on { background: var(--cream); color: var(--brown); font-weight: bold; }
+
+  /* 메뉴 카드 */
+  .item { padding: 14px 16px; margin-bottom: 10px; }
+  .item .row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .item .name { font-size: 16px; font-weight: bold; }
+  .item .price { font-size: 15px; white-space: nowrap; }
+  .item .desc { margin-top: 4px; font-size: 13px; opacity: 0.75; }
+
+  /* 가게 안내 */
+  .info { padding: 18px; margin-top: 24px; font-size: 14px; line-height: 1.9; }
+  .info b { display: inline-block; width: 64px; }
+  .info a { color: inherit; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>브릿지 커피</h1>
+    <p class="intro">매일 직접 볶는 스페셜티 커피</p>
+    <p class="place">광주 북구 비엔날레</p>
+  </header>
+
+  <h2 class="section">대표 메뉴</h2>
+  <div class="signature" id="signature"></div>
+
+  <div class="tabs" id="tabs"></div>
+  <div id="list"></div>
+
+  <!-- 가게 안내: 영업시간, 전화번호 등은 여기 글자를 직접 고치면 됩니다 -->
+  <div class="glass info">
+    <div><b>영업시간</b>평일 08:00 - 21:00</div>
+    <div><b></b>주말 10:00 - 20:00</div>
+    <div><b>휴무</b>매주 목요일</div>
+    <div><b>전화번호</b><a href="tel:062-000-0000">062-000-0000</a></div>
+    <div><b>주차</b>2대 가능</div>
+    <div><b>자리</b>1인 좌석 6석</div>
+    <div><b>인스타</b>@bridge_coffee</div>
+  </div>
+
+</div>
+
+<script>
+  // ===== 메뉴 목록 =====
+  // 여기를 고치면 메뉴와 가격이 바뀝니다.
+  // 한 줄 = 메뉴 하나. 이름 / 가격 / 설명 / 종류(커피, 논커피, 디저트) 순서입니다.
+  // 대표 메뉴로 보이게 하려면 대표: true 를 붙이세요.
+  const MENU = [
+    { 이름: "아메리카노", 가격: 4500, 설명: "산미가 적은 고소한 원두", 종류: "커피" },
+    { 이름: "카페라떼", 가격: 5000, 설명: "부드러운 우유 거품", 종류: "커피" },
+    { 이름: "바닐라 라떼", 가격: 5500, 설명: "바닐라빈을 직접 우려낸 시럽", 종류: "커피" },
+    { 이름: "아인슈페너", 가격: 5800, 설명: "단맛을 줄인 수제 크림", 종류: "커피", 대표: true },
+    { 이름: "콜드브루", 가격: 5300, 설명: "12시간 저온 추출, 목넘김이 깔끔함", 종류: "커피" },
+    { 이름: "디카페인 아메리카노", 가격: 5000, 설명: "카페인 걱정 없이 편하게", 종류: "커피" },
+
+    { 이름: "흑임자 라떼", 가격: 5500, 설명: "국산 흑임자를 직접 갈아 넣음", 종류: "논커피", 대표: true },
+    { 이름: "말차 라떼", 가격: 5800, 설명: "우지 말차, 쌉싸름한 맛이 진함", 종류: "논커피" },
+    { 이름: "쑥 라떼", 가격: 5500, 설명: "강화도 쑥, 은은하고 담백함", 종류: "논커피" },
+    { 이름: "곡물 라떼", 가격: 5300, 설명: "볶은 곡물의 구수한 맛", 종류: "논커피" },
+    { 이름: "자몽에이드", 가격: 6000, 설명: "생과일 자몽 과육을 그대로", 종류: "논커피" },
+
+    { 이름: "치즈케이크", 가격: 6500, 설명: "굽지 않은 부드러운 식감", 종류: "디저트" },
+    { 이름: "당근케이크", 가격: 6000, 설명: "견과류를 넉넉히 넣음", 종류: "디저트" },
+    { 이름: "스콘", 가격: 4000, 설명: "겉은 바삭 속은 촉촉, 잼과 함께", 종류: "디저트" },
+    { 이름: "바스크 치즈케이크", 가격: 6800, 설명: "겉면을 진하게 태운 풍미", 종류: "디저트" }
+  ];
+
+  // 카테고리 버튼 이름 (메뉴의 종류와 글자가 같아야 합니다)
+  const 종류목록 = ["전체", "커피", "논커피", "디저트"];
+
+  const 원 = n => n.toLocaleString("ko-KR") + "원";
+
+  // 대표 메뉴 그리기
+  document.getElementById("signature").innerHTML = MENU.filter(m => m.대표).map(m =>
+    `<div class="glass"><span class="badge">대표 메뉴</span>
+     <div class="name">${m.이름}</div><div class="price">${원(m.가격)}</div></div>`
+  ).join("");
+
+  // 메뉴 목록 그리기
+  const list = document.getElementById("list");
+  function 보여주기(종류) {
+    list.innerHTML = MENU.filter(m => 종류 === "전체" || m.종류 === 종류).map(m =>
+      `<div class="glass item">
+         <div class="row"><span class="name">${m.이름}</span><span class="price">${원(m.가격)}</span></div>
+         <div class="desc">${m.설명}</div>
+       </div>`
+    ).join("");
+    document.querySelectorAll(".tabs button").forEach(b =>
+      b.classList.toggle("on", b.textContent === 종류));
+  }
+
+  // 카테고리 버튼 만들기
+  const tabs = document.getElementById("tabs");
+  종류목록.forEach(t => {
+    const b = document.createElement("button");
+    b.textContent = t;
+    b.onclick = () => 보여주기(t);
+    tabs.appendChild(b);
+  });
+
+  보여주기("전체");
+</script>
+</body>
+</html>
